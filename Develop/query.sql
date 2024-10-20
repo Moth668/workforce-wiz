@@ -1,0 +1,8 @@
+-- interacts with data in a database using the names of tables, columns,
+-- and relationships between tables. Queries enable us to supply
+-- data to the front end to build sites that cadn interact with lots of 
+-- data quickkly and easily. 
+-- SELECT *
+-- FROM A_TABLE
+-- INNER JOIN A_RELATED_TABLE
+-- ON DATA_THEY_HAVE_IN_COMMON;
