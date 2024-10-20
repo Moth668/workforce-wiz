@@ -1,7 +1,13 @@
-# workforce-wiz
-Use this command line application to to manage a company's employee database, using Node.js, Inquirer, and PostgreSQL.
+# Workforce-Wiz
+Use this command line application, content management systems (CMS) to manage a company's employee database, using Node.js, Inquirer, and PostgreSQL.
 
 # Table Of Contents
+* [Workforce-Wiz](#workforce-wiz)
+* [Task](#task)
+* [User Story](#user-story)
+* [Acceptance Criteria](#acceptance-criteria)
+* [Video](#video)
+* [Repository](#repository)
 
 ## Task
 
@@ -41,9 +47,10 @@ WHEN I choose to update an employee role
 THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
 ```
 
-## Mock-Up
-
+## Video
 The following video shows an example of the application being used from the command line:
 
 [![A video thumbnail shows the command-line employee management application with a play button overlaying the view.]('insert video link here')
 
+
+## Repository 
