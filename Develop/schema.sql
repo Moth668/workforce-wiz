@@ -1,10 +1,14 @@
 
-DROP DATABASE IF EXISTS department_db;
-CREATE DATABASE department_db;
+-- create a database using postgresql?
+-- CREATE DATABASE database_name;
 
-USE department_db;
+DROP DATABASE IF EXISTS workforce;
+CREATE DATABASE workforce;
 
-SELECT current_database();
+\c workforce;
+
+-- create a table using postgresql?
+-- CREATE TABLE table_name();
 
 -- `department`
 CREATE TABLE department (
@@ -12,6 +16,7 @@ CREATE TABLE department (
 department_id SERIAL PRIMARY KEY,
 -- `name`: `VARCHAR(30) UNIQUE NOT NULL` to hold department name
 department_name VARCHAR(30) UNIQUE NOT NULL
+-- ON DELETE SET NULL
 );
 
 -- * `role`
@@ -24,6 +29,7 @@ role_title VARCHAR(30) UNIQUE NOT NULL,
 role_salary DECIMAL NOT NULL,
 --   * `department_id`: `INTEGER NOT NULL` to hold reference to department role belongs to
 department_id INTEGER NOT NULL REFERENCES department(department_id)
+-- ON DELETE SET NULL
 );
 
 -- * `employee`
