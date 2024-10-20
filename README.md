@@ -48,9 +48,10 @@ THEN I am prompted to select an employee to update and their new role and this i
 ```
 
 ## Video
-The following video shows an example of the application being used from the command line:
 
-[![A video thumbnail shows the command-line employee management application with a play button overlaying the view.]('insert video link here')
+* This [link](https://youtu.be/oPSw4Ta3lBQ) will take you to [YouTube](https://youtu.be/oPSw4Ta3lBQ) to view the [video walkthrough](https://youtu.be/oPSw4Ta3lBQ) of this application.
 
 
 ## Repository 
+
+* This [link](https://github.com/Moth668/workforce-wiz) will take you to my [GitHub Repository](https://github.com/Moth668/workforce-wiz).

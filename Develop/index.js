@@ -15,6 +15,13 @@ const mainMenu = () => {
         'Add a role',
         'Add an employee',
         'Update an employee role',
+        'Update a manager',
+        'View employees by manager',
+        'View employees by department',
+        'Delete a department',
+        'Delete a role',
+        'Delete employee',
+        'Calculate total salary',
         'Exit'
       ]
     })
@@ -41,12 +48,34 @@ const mainMenu = () => {
         case 'Update an employee role':
           updateEmployeeRole();
           break;
+        case 'Update a manager':
+          updateEmployeeManager();
+          break;
+        case 'View employees by manager':
+          viewEmployeesByManager();
+          break;
+        case 'View employees by department':
+          viewEmployeesByDepartment();
+          break;
+        case 'Delete a department':
+          deleteDepartment();
+          break;
+        case 'Delete a role':
+          deleteRole();
+          break;
+        case 'Delete employee':
+          deleteEmployee();
+          break;
+        case 'Calculate total salary':
+          viewTotalBudgetByDepartment();
+          break;
         default:
           pool.end(err => {
             if (err) {
               console.error('Error closing the database connection:', err);
             } else {
               console.log('Database connection closed.');
+              mainMenu();
             }
             process.exit();
           });
@@ -173,6 +202,185 @@ const updateEmployeeRole = () => {
       }
     });
 };
+
+// Function to update an employee's manager
+async function updateEmployeeManager() {
+  const employees = await pool.query('SELECT * FROM employee');
+  const employeeChoices = employees.rows.map(emp => ({
+      name: `${emp.first_name} ${emp.last_name}`,
+      value: emp.employee_id
+  }));
+
+  const managers = await pool.query('SELECT * FROM employee');
+  const managerChoices = managers.rows.map(manager => ({
+      name: `${manager.first_name} ${manager.last_name}`,
+      value: manager.employee_id
+  }));
+
+  const { employee_id, manager_id } = await inquirer.prompt([
+      {
+          type: 'list',
+          name: 'employee_id',
+          message: 'Select the employee to update:',
+          choices: employeeChoices
+      },
+      {
+          type: 'list',
+          name: 'manager_id',
+          message: 'Select the new manager for this employee (if applicable):',
+          choices: [...managerChoices, { name: 'None', value: null }]
+      }
+  ]);
+
+  await pool.query('UPDATE employee SET manager_id = $1 WHERE employee_id = $2', [manager_id, employee_id]);
+  console.log(`Employee's manager updated successfully.`);
+  mainMenu();
+};
+
+// Function to view employees that report to a specific manager
+async function viewEmployeesByManager() {
+  const managers = await pool.query('SELECT * FROM employee');
+  const managerChoices = managers.rows.map(manager => ({
+      name: `${manager.first_name} ${manager.last_name}`,
+      value: manager.employee_id
+  }));
+
+  const { manager_id } = await inquirer.prompt([
+      {
+          type: 'list',
+          name: 'manager_id',
+          message: 'Select a manager to view their employees:',
+          choices: managerChoices
+      }
+  ]);
+
+  const res = await pool.query('SELECT * FROM employee WHERE manager_id = $1', [manager_id]);
+  console.table(res.rows);
+  mainMenu();
+}
+
+// Function to view employees that belong to a department
+async function viewEmployeesByDepartment() {
+  const departments = await pool.query('SELECT * FROM department');
+  const departmentChoices = departments.rows.map(dept => ({
+      name: dept.department_name,
+      value: dept.department_id
+  }));
+
+  const { department_id } = await inquirer.prompt([
+      {
+          type: 'list',
+          name: 'department_id',
+          message: 'Select a department to view its employees:',
+          choices: departmentChoices
+      }
+  ]);
+
+  const res = await pool.query(`
+      SELECT e.*, r.role_title
+      FROM employee e
+      JOIN employee_role r ON e.role_id = r.role_id
+      WHERE r.department_id = $1
+  `, [department_id]);
+  
+  console.table(res.rows);
+  mainMenu();
+}
+
+// Function to delete an entire department
+async function deleteDepartment() {
+  const departments = await pool.query('SELECT * FROM department');
+  const departmentChoices = departments.rows.map(dept => ({
+      name: dept.department_name,
+      value: dept.department_id
+  }));
+
+  const { department_id } = await inquirer.prompt([
+      {
+          type: 'list',
+          name: 'department_id',
+          message: 'Select a department to delete:',
+          choices: departmentChoices
+      }
+  ]);
+
+  await pool.query('DELETE FROM department WHERE department_id = $1', [department_id]);
+  console.log(`Department deleted successfully.`);
+  mainMenu();
+}
+
+// Function to delete an entire role
+async function deleteRole() {
+  const roles = await pool.query('SELECT * FROM employee_role');
+  const roleChoices = roles.rows.map(role => ({
+      name: role.role_title,
+      value: role.role_id
+  }));
+
+  const { role_id } = await inquirer.prompt([
+      {
+          type: 'list',
+          name: 'role_id',
+          message: 'Select a role to delete:',
+          choices: roleChoices
+      }
+  ]);
+
+  await pool.query('DELETE FROM employee_role WHERE role_id = $1', [role_id]);
+  console.log(`Role deleted successfully.`);
+  mainMenu();
+}
+
+// Function to delete an employee
+async function deleteEmployee() {
+  const employees = await pool.query('SELECT * FROM employee');
+  const employeeChoices = employees.rows.map(emp => ({
+      name: `${emp.first_name} ${emp.last_name}`,
+      value: emp.employee_id
+  }));
+
+  const { employee_id } = await inquirer.prompt([
+      {
+          type: 'list',
+          name: 'employee_id',
+          message: 'Select an employee to delete:',
+          choices: employeeChoices
+      }
+  ]);
+
+  await pool.query('DELETE FROM employee WHERE employee_id = $1', [employee_id]);
+  console.log(`Employee deleted successfully.`);
+  mainMenu();
+}
+
+// Function to view calculate total salary of employees in a department
+async function viewTotalBudgetByDepartment() {
+  const departments = await pool.query('SELECT * FROM department');
+  const departmentChoices = departments.rows.map(dept => ({
+      name: dept.department_name,
+      value: dept.department_id
+  }));
+
+  const { department_id } = await inquirer.prompt([
+      {
+          type: 'list',
+          name: 'department_id',
+          message: 'Select a department to view the total budget:',
+          choices: departmentChoices
+      }
+  ]);
+
+  const res = await pool.query(`
+      SELECT SUM(r.role_salary) AS total_budget
+      FROM employee e
+      JOIN employee_role r ON e.role_id = r.role_id
+      WHERE r.department_id = $1
+  `, [department_id]);
+
+  console.log(`Total utilized budget for the selected department: $${res.rows[0].total_budget || 0}`);
+  mainMenu();
+}
+
 
 // Start the application
 mainMenu();
